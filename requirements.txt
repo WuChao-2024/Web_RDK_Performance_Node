@@ -1,2 +1,2 @@
-psutil==5.9.6
-flask==3.0.0
+psutil
+flask
