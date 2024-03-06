@@ -21,6 +21,7 @@
     <title>Performance Node</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}">
     <script src="{{ url_for('static', filename='echarts.min.js') }}"></script>
+    <link href="{{ url_for('static', filename='niceButton.css') }}" rel="stylesheet" type="text/css" />
 </head>
 
 <body onload="boot_all_interval()">
@@ -40,7 +41,6 @@
                 </td>
             </tr>
         </table>
-        当前为竖屏，<a href="/wide">点我前往横屏界面</a>
 
         <HR align=center width=550 color=#987cb9 SIZE=2>
 
@@ -52,7 +52,8 @@
         <div id="memory" style="width: 500px;height:200px;"></div>
         <br><!-- 磁盘信息图表 -->
         <div id="disk" style="width: 500px;height:100px;"></div>
-        <br><!-- 信息簇 -->
+        <!-- <br> -->
+        <!-- 信息簇 -->
         <table border="1">
             <tr>
                 <td align="center" bgcolor="#fbdfdf">
@@ -109,12 +110,24 @@
                 </td>
             </tr>
         </table>
+        <br>
+        <HR align=center width=550 color=#987cb9 SIZE=2>
 
         <!-- 修改采样间隔 -->
         <br>
-        <input type="text" id="setTime" style="width:60px;">ms
-        <button onclick="setTime()">当前采样间隔<span id="timeNow">1000</span>ms, 点我修改</button>
-        <HR width=550 color=#987cb9 SIZE=2>
+        <input type="text" id="setTime" style="width:80px;height:50px;font-size:20px;">ms
+        <button onclick="setTime()" class="niceButton">
+            当前采样间隔<span id="timeNow">1000</span>ms, 点我修改
+        </button>
+        <br><br>
+        <button onclick="changeMode()" style="width: 480px;" class="niceButton"
+            id="mode_name">performance（CPU调频模式,点击切换）</button>
+        <br><br>
+        当前为横屏，
+        <a href="/">
+            点我前往竖屏界面
+        </a>
+
 
     </center>
 

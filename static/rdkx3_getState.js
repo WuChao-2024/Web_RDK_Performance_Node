@@ -357,7 +357,7 @@ disk_chart.setOption(disk_option);
 // 变量
 var time_interval = 1000; // 初始化时的间隔 100ms
 var data_array_len = 120;
-var sh_control;   // CPU, BPU, MEM状态更新的POST函数间隔任务的控制句柄
+var sh_control;           // CPU, BPU, MEM状态更新的POST函数间隔任务的控制句柄
 // 从stateString解析数据
 var cpu_total, cpu_0, cpu_1, cpu_2, cpu_3;
 var mem_rate, mem_free, mem_used;
@@ -441,6 +441,8 @@ function POST_state() {
             // 获得stateString
             stateString_split = this.responseText.split(",");
             // 解析stateString
+            /// CPU频率部分
+            cpu_freq = (parseFloat(stateString_split[9]) / 1000).toFixed(1);
             /// 温度部分
             temp = (parseFloat(stateString_split[8]) / 1000).toFixed(1);
             //// 更新温度看板数据
@@ -469,9 +471,9 @@ function POST_state() {
             cpu_3_data.push(cpu_3);
             //// 将CPU图表的数据设置使能图表
             if (cpu_total < 10) {
-                cpu_option.title.text = 'CPU Total \n  ' + cpu_total + ' % (' + temp + '℃)';
+                cpu_option.title.text = 'CPU Total \n  ' + cpu_total + ' % (' + cpu_freq + 'GHz)';
             } else {
-                cpu_option.title.text = 'CPU Total \n' + cpu_total + ' % (' + temp + '℃)';
+                cpu_option.title.text = 'CPU Total \n' + cpu_total + ' % (' + cpu_freq + 'GHz)';
             }
             cpu_option.series[0].data = cpu_0_data;
             cpu_option.series[1].data = cpu_1_data;
@@ -495,7 +497,7 @@ function POST_state() {
             mem_option.series[0].data = mem_used_data;
             mem_option.series[1].data = mem_free_data;
             mem_chart.setOption(mem_option);
-            // bpu 部分
+            // BPU 部分
             //// 得到BPU数据
             bpu_0 = parseFloat(stateString_split[6]);
             bpu_1 = parseFloat(stateString_split[7]);
@@ -520,7 +522,7 @@ function POST_state() {
             bpu_chart.setOption(bpu_option);
         }
     };
-    xhttp.open("GET", "getState", true);
+    xhttp.open("GET", "getState_rdkx3", true);
     xhttp.send();
 }
 
@@ -546,6 +548,34 @@ function POST_disk() {
             disk_chart.setOption(disk_option);
         }
     };
-    xhttp.open("GET", "getDisk", true);
+    xhttp.open("GET", "getDisk_rdkx3", true);
     xhttp.send();
+}
+
+// 频率调节按钮
+var state = 0;
+var mode_list = ["performance", "schedutil", "powersave"];
+let timerId;
+
+function debounce(func, delay) {
+    clearTimeout(timerId);
+    timerId = setTimeout(() => {
+        func();
+    }, delay);
+}
+function changeMode() {
+    state = (state + 1) % 3;
+    setMode(state);
+    // 使用防抖函数，延迟2秒后发送请求
+    debounce(() => {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+        };
+        xhttp.open("GET", "/mode_rdkx3?state=" + state, true);
+        xhttp.send();
+    }, 2000);
+}
+
+function setMode(state) {
+    document.getElementById("mode_name").innerHTML = mode_list[state] + "（CPU调频模式，点击切换）";
 }

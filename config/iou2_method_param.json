@@ -1,0 +1,15 @@
+{
+    "match_type": "IOU",
+    "tracker_type": "IOU_2.0",
+    "use_kalman_filter": 1,
+    "missing_time_thres": 2,
+    "vanish_frame_count": 50,
+    "time_gap": 40,
+    "remove_obsolete_track": 0,
+    "iou_thres": 0.2,
+    "euclidean_thres": 200,
+    "use_location_gain": 1,
+    "max_trajectory_number": 3,
+    "min_score": 0.8,
+    "ignore_overlap_thres": 0.9
+}

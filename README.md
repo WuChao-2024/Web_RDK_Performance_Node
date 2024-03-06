@@ -27,32 +27,3 @@ python3 app.py
 ```
 
 
-
-
-### BPU调频策略
-查看BPU支持的调频策略
-```bash
-cat /sys/devices/system/bpu/bpu0/devfreq/devfreq1/available_governors
-cat /sys/devices/system/bpu/bpu1/devfreq/devfreq1/available_governors
-```
-更改BPU模式
-bpu_ondemand powersave performance simple_ondemand
-```bash
-sudo bash -c "echo performance > /sys/devices/system/bpu/bpu0/devfreq/devfreq1/governor"
-sudo bash -c "echo performance > /sys/devices/system/bpu/bpu1/devfreq/devfreq2/governor"
-```
-
-### CPU调频策略
-```bash
-cat /sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors
-```
-更改CPU模式
-conservative: 需要时逐级调整
-ondemand: 需要时立刻调整
-powersave: 节能
-performance: 性能
-```bash
-sudo bash -c "echo performance > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor"
-sudo bash -c "echo conservative > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor"
-```
-
