@@ -84,7 +84,7 @@ if __name__ == "__main__":
     # 用户输入
     parser = argparse.ArgumentParser()
     parser.add_argument('--device', type=int, default='-1', help='0: RDK X3 (Module), 1: RDK Ultra, 2: RDK X5\n')
-    parser.add_argument('--port', type=int, default='5000', help='enter the port you like.')
+    parser.add_argument('--port', type=int, default='7999', help='enter the port you like.')
     parser.add_argument('--debug', type=int, default='0', help='Flask Debug Mode, 0:false, 1:true.')
     parser.add_argument('--log', type=int, default='0', help='Flask log, 0:false, 1:true.')
     opt = parser.parse_args()

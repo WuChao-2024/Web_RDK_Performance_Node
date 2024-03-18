@@ -20,10 +20,10 @@ pip install -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple/ --trus
 python3 app.py
 ```
 
-在同一局域网访问X3的5000端口即可
+在同一局域网访问X3的7999端口即可
 
 ```bash
-192.168.xxx.xxx:5000
+192.168.xxx.xxx:7999
 ```
 
 
