@@ -56,6 +56,7 @@ def getState_rdkx3():
     bpu0.close()
     bpu1.close()
     cpu_temp.close()
+    cpu_freq.close()
 
     return stateString
 
