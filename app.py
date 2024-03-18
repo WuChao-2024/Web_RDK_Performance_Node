@@ -32,6 +32,31 @@ def index_wide():
     return render_template(DEVICE_NAME + "_wide.html")
 
 # 请求CPU, BPU, Memory, Tempture 信息（快速）
+@app.route("/getState_rdkultra")
+def getState_rdkultra():
+    stateString = ""
+    ## CPU
+    # cpu0, cpu1, cpu2, cpu3,
+    cpus = cpu_percent(percpu=True)
+    stateString += "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,"%((cpus[0],cpus[1],cpus[2],cpus[3],cpus[4],cpus[5],cpus[6],cpus[7]))
+    
+    ## Memory
+    # memory_free, memoryrate, (MiB)
+    memorys = virtual_memory()
+    stateString += "%012d,%012d,"%(memorys[3], memorys[1])
+    
+    ## BPU  ## Temp   ## CPU freq
+    bpu0 = open('/sys/devices/system/bpu/bpu0/ratio', 'r', encoding='utf-8')
+    bpu1 = open('/sys/devices/system/bpu/bpu1/ratio', 'r', encoding='utf-8')
+    cpu_temp = open('/sys/devices/virtual/thermal/thermal_zone8/temp', 'r',  encoding='utf-8')
+    stateString += "%03d,%03d,"%(int(bpu0.read()), int(bpu1.read()))
+    stateString += "%s,"%cpu_temp.read()[0:5]
+    bpu0.close()
+    bpu1.close()
+    cpu_temp.close()
+
+    return stateString
+
 @app.route("/getState_rdkx3")
 def getState_rdkx3():
     stateString = ""
@@ -61,6 +86,14 @@ def getState_rdkx3():
     return stateString
 
 # 请求磁盘占用信息（慢速）
+@app.route("/getDisk_rdkultra")
+def getDisk_rdkultra():
+    ## 磁盘信息
+    ## total, free
+    disk_info = disk_usage("/")
+    disk_info_string = "%014d,%014d"%(disk_info[1],disk_info[2])
+    return disk_info_string
+
 @app.route("/getDisk_rdkx3")
 def getDisk_rdkx3():
     ## 磁盘信息
@@ -70,15 +103,27 @@ def getDisk_rdkx3():
     return disk_info_string
 
 # 修改CPU性能模式
+@app.route("/mode_rdkultra")
+def mode_rdkultra():
+    state_value = request.args.get('state')
+    cmd = "sudo bash -c \"echo " + mode_list[int(state_value)] + " > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor\" && "
+    cmd += "sudo bash -c \"echo " + mode_list[int(state_value)] + " > /sys/devices/system/cpu/cpufreq/policy1/scaling_governor\" && "
+    cmd += "sudo bash -c \"echo " + mode_list[int(state_value)] + " > /sys/devices/system/cpu/cpufreq/policy2/scaling_governor\" && "
+    cmd += "sudo bash -c \"echo " + mode_list[int(state_value)] + " > /sys/devices/system/cpu/cpufreq/policy3/scaling_governor\" && "
+    cmd += "sudo bash -c \"echo " + mode_list[int(state_value)] + " > /sys/devices/system/cpu/cpufreq/policy4/scaling_governor\" && "
+    cmd += "sudo bash -c \"echo " + mode_list[int(state_value)] + " > /sys/devices/system/cpu/cpufreq/policy5/scaling_governor\" && "
+    cmd += "sudo bash -c \"echo " + mode_list[int(state_value)] + " > /sys/devices/system/cpu/cpufreq/policy6/scaling_governor\" && "
+    cmd += "sudo bash -c \"echo " + mode_list[int(state_value)] + " > /sys/devices/system/cpu/cpufreq/policy7/scaling_governor\""
+    system(cmd)
+    return "OK"
+
 @app.route("/mode_rdkx3")
 def mode_rdkx3():
     state_value = request.args.get('state')
-    system("sudo bash -c \"echo " + mode_list[int(state_value)] + " > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor\"")
+    cmd = "sudo bash -c \"echo " + mode_list[int(state_value)] + " > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor\""
+    system(cmd)
     return "OK"
 
-@app.route("/test_page")
-def test_page():
-    return render_template("test_button.html")
 
 if __name__ == "__main__":
     # 用户输入
@@ -129,4 +174,4 @@ if __name__ == "__main__":
         log.setLevel(logging.ERROR)
 
     # 启动应用
-    app.run(debug=bool(opt.debug), port=opt.port, host="0.0.0.0")
+    app.run(debug=bool(opt.debug), port=int(opt.port), host="0.0.0.0")

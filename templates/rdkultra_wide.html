@@ -1,0 +1,177 @@
+<!--
+// Copyright (c) 2023, Horizon Robotics.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Performance Node</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <script src="{{ url_for('static', filename='echarts.min.js') }}"></script>
+    <link href="{{ url_for('static', filename='niceButton.css') }}" rel="stylesheet" type="text/css" />
+</head>
+
+<body onload="boot_all_interval()">
+    <!-- 首页logo -->
+    <center>
+        <table>
+            <tr>
+                <td>
+                    <a href="/"><img alt="icon"
+                            src="{{ url_for('static', filename='images/logo-HorizonDeveloper.svg') }}"></a>
+                </td>
+                <td style="width: 10px;">
+                </td>
+                <td>
+                    <h1 style="color:#211133">Performance Node</h1>
+                </td>
+
+            </tr>
+        </table>
+        <HR align=center width=1100 color=#987cb9 SIZE=2>
+        <table>
+            <tr>
+                <td width="550" height="350" align="center">
+                    <!-- CPU信息图表 -->
+                    <div id="cpu" style="width: 500px;height:300px;"></div>
+                </td>
+                <td width="550" align="center">
+                    <!-- BPU信息图表 -->
+                    <div id="bpu" style="width: 500px;height:300px;"></div>
+                </td>
+            </tr>
+            <tr>
+                <td align="center" height="350">
+                    <!-- 内存信息图表 -->
+                    <div id="memory" style="width: 500px;height:300px;"></div>
+                </td>
+                <td align="center">
+                    <!-- 磁盘信息图表 -->
+                    <div id="disk" style="width: 500px;height:100px;"></div>
+                    <!-- <br> -->
+                    <!-- 信息簇 -->
+                    <table border="1" height="200">
+                        <tr>
+                            <td align="center" bgcolor="#fbdfdf">
+                                <p>CPU_Total: <br>
+                                    <strong><span id="CPU_Total">--.--</span> %</strong>
+                                </p>
+                            </td>
+                            <td align="center" bgcolor="#fbdfdf">
+                                <p>CPU_0: <br>
+                                    <strong><span id="CPU_0">--.--</span> %</strong>
+                                </p>
+                            </td>
+                            <td align="center" bgcolor="#fbdfdf">
+                                <p>CPU_1: <br>
+                                    <strong><span id="CPU_1">--.--</span> %</strong>
+                                </p>
+                            </td>
+                            <td align="center" bgcolor="#fbdfdf">
+                                <p>CPU_2: <br>
+                                    <strong><span id="CPU_2">--.--</span> %</strong>
+                                </p>
+                            </td>
+                            <td align="center" bgcolor="#fbdfdf">
+                                <p>CPU_3: <br>
+                                    <strong><span id="CPU_3">--.--</span> %</strong>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center" width="100" bgcolor="#dbe1f3">
+                                <p>Mem: <br>
+                                    <strong><span id="Mem">--.--</span> %</strong>
+                                </p>
+                            </td>
+                            <td align="center" bgcolor="#fbdfdf">
+                                <p>CPU_4: <br>
+                                    <strong><span id="CPU_4">--.--</span> %</strong>
+                                </p>
+                            </td>
+                            <td align="center" bgcolor="#fbdfdf">
+                                <p>CPU_5: <br>
+                                    <strong><span id="CPU_5">--.--</span> %</strong>
+                                </p>
+                            </td>
+                            <td align="center" bgcolor="#fbdfdf">
+                                <p>CPU_6: <br>
+                                    <strong><span id="CPU_6">--.--</span> %</strong>
+                                </p>
+                            </td>
+                            <td align="center" bgcolor="#fbdfdf">
+                                <p>CPU_7: <br>
+                                    <strong><span id="CPU_7">--.--</span> %</strong>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center" width="100" bgcolor="#f6eeff">
+                                <p>BPU_Total: <br>
+                                    <strong><span id="BPU_Total">--.--</span> %</strong>
+                                </p>
+                            </td>
+                            <td align="center" width="100" bgcolor="#f6eeff">
+                                <p>BPU_0: <br>
+                                    <strong><span id="BPU_0">--.--</span> %</strong>
+                                </p>
+                            </td>
+                            <td align="center" width="100" bgcolor="#f6eeff">
+                                <p>BPU_1: <br>
+                                    <strong><span id="BPU_1">--.--</span> %</strong>
+                                </p>
+                            </td>
+                            <td align="center" width="100" bgcolor="#dbe1f3">
+                                <p>Disk: <br>
+                                    <strong><span id="Disk">--.--</span> %</strong>
+                                </p>
+                            </td>
+                            <td align="center" width="100" bgcolor="#fbd88a">
+                                <p>Temp: <br>
+                                    <strong><span id="Temp">--.--</span> ℃</strong>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+
+    </center>
+    <HR align=center width=1100 color=#987cb9 SIZE=2>
+    <!-- 修改采样间隔 -->
+    <br>
+    <center>
+        <input type="text" id="setTime" style="width:80px;height:50px;font-size:20px;">ms
+        <button onclick="setTime()" class="niceButton">
+            当前采样间隔<span id="timeNow">1000</span>ms, 点我修改
+        </button>
+        <br><br>
+        <button onclick="changeMode()" style="width: 480px;" class="niceButton"
+            id="mode_name">performance（CPU调频模式,点击切换）</button>
+        <br><br>
+        当前为横屏，
+        <a href="/">
+            点我前往竖屏界面
+        </a>
+    </center>
+
+
+</body>
+<script src="{{ url_for('static', filename='rdkultra_getState.js') }}"></script>
+
+</html>
