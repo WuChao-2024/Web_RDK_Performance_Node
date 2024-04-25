@@ -3,6 +3,10 @@ English| [简体中文](./README_cn.md)
 # Performance Node
 The Performance Node application is a web-based tool accessible via any computer or mobile device's browser regardless of brand. To set up and use the application:
 
+<img src=".\doc\desktop_demo.jpg" alt="desktop_demo" style="zoom:70%;" />
+
+<img src=".\doc\mult_device.jpg" alt="mult_device" style="zoom:70%;" />
+
 1. **Installation**
    Install required packages, primarily Flask and psutil, using the following command:
    ```bash
@@ -57,3 +61,5 @@ The Performance Node application is a web-based tool accessible via any computer
 The application includes various power/performance modes such as 'performance' (highest frequency), 'powersave' (lowest frequency), and 'schedutil' (Linux 4.7+ strategy adjusting frequency based on scheduler-provided CPU utilization info).
 
 Users encountering issues can submit issues or pull requests. There's also a satisfaction survey for the Performance Node, displayed as an image link.
+
+<img src=".\doc\survey.jpg" alt="survey" style="zoom:20%;" />
