@@ -18,9 +18,9 @@ from os import system
 import argparse
 
 DEVICE_NAME = "rdkx3"
-DEVICE_NUM = 0 # 0:rdkx3, 1:rdkultra
+DEVICE_NUM = 0 # 0:rdkx3, 1:rdkultra 2:rdkx5
 mode_list = ["performance", "schedutil", "powersave"]
-
+mode_list_rdkx5 = ["performance","ondemand","userspace","powersave","schedutil"]
 # Flask app
 app = Flask(__name__)
 @app.route("/")
@@ -57,6 +57,45 @@ def getState_rdkultra():
 
     return stateString
 
+
+@app.route("/getState_rdkx5")
+def getState_rdkx5():
+    stateString = ""
+    ## CPU
+    cpus = cpu_percent(percpu=True)
+    stateString += "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,"%((cpus[0],cpus[1],cpus[2],cpus[3],cpus[4],cpus[5],cpus[6],cpus[7]))
+    
+    ## Memory
+    memorys = virtual_memory()
+    stateString += "%012d,%012d,"%(memorys[3], memorys[1])
+    
+    ## BPU  ## GPU  ## Temp
+    bpu0 = open('/sys/devices/system/bpu/bpu0/ratio', 'r', encoding='utf-8')
+    gpu0 = open('/sys/kernel/debug/gc/load', 'r', encoding='utf-8')
+    gpu_load = 0
+    
+    try:
+        with gpu0 as f:
+            for line in f:
+                if 'load' in line:
+                    gpu_load = int(line.split(':')[1].strip().rstrip('%'))
+                    # print(f"Debug - GPU Load: {gpu_load}%")
+                    break
+    except Exception as e:
+        print("获取GPU load失败:", e)
+        
+    cpu_temp = open('/sys/class/hwmon/hwmon0/temp3_input', 'r',  encoding='utf-8')
+    
+    stateString += "%03d,%03d,"%(int(bpu0.read()), int(gpu_load))
+    stateString += "%s,"%cpu_temp.read()[0:5]
+    # print(f"Debug - Final stateString: {stateString}")
+    
+    bpu0.close()
+    gpu0.close()
+    cpu_temp.close()
+
+    return stateString
+
 @app.route("/getState_rdkx3")
 def getState_rdkx3():
     stateString = ""
@@ -87,6 +126,15 @@ def getState_rdkx3():
 
 # 请求磁盘占用信息（慢速）
 @app.route("/getDisk_rdkultra")
+def getDisk_rdkx5():
+    ## 磁盘信息
+    ## total, free
+    disk_info = disk_usage("/")
+    disk_info_string = "%014d,%014d"%(disk_info[1],disk_info[2])
+    return disk_info_string
+
+# 请求磁盘占用信息（慢速）
+@app.route("/getDisk_rdkx5")
 def getDisk_rdkultra():
     ## 磁盘信息
     ## total, free
@@ -114,6 +162,15 @@ def mode_rdkultra():
     cmd += "sudo bash -c \"echo " + mode_list[int(state_value)] + " > /sys/devices/system/cpu/cpufreq/policy5/scaling_governor\" && "
     cmd += "sudo bash -c \"echo " + mode_list[int(state_value)] + " > /sys/devices/system/cpu/cpufreq/policy6/scaling_governor\" && "
     cmd += "sudo bash -c \"echo " + mode_list[int(state_value)] + " > /sys/devices/system/cpu/cpufreq/policy7/scaling_governor\""
+    system(cmd)
+    return "OK"
+
+@app.route("/mode_rdkx5")
+def mode_rdkx5():
+    state_value = request.args.get('state')                                 
+    cmd = "sudo bash -c \"echo 1 > /sys/devices/system/cpu/cpufreq/boost\" && "
+    cmd += "sudo bash -c \"echo " + mode_list_rdkx5[int(state_value)] + " > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor\" && "
+    cmd += "sudo bash -c \"echo 1200000000 > /sys/kernel/debug/clk/bpu_mclk_2x_clk/clk_rate\""
     system(cmd)
     return "OK"
 

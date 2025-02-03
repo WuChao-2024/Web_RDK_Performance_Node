@@ -20,7 +20,7 @@ pip install -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple/ --trus
 python3 app.py
 ```
 
-### 1.3 在同一局域网访问X3的7999端口即可
+### 1.3 在同一局域网访问RDK设备的7999端口即可
 
 ```bash
 192.168.xxx.xxx:7999
@@ -65,7 +65,17 @@ BPU占用率数据来自于以下文件
 /sys/devices/system/bpu/bpu0/ratio
 /sys/devices/system/bpu/bpu1/ratio
 ```
-### 3.3 内存占用数据
+#### RDK X5(单核)
+```bash
+/sys/devices/system/bpu/bpu0/ratio
+```
+### 3.3 GPU占用数据
+#### RDK X5
+```bash
+/sys/kernel/debug/gc/load
+```
+
+### 3.4 内存占用数据
 #### RDK X3, RDK X3 Module, RDK Ultra
 通过`psutil.virtual_memory()`函数获取内存信息,该函数返回一个命名元组,包含多种关于系统虚拟内存的信息.
 
@@ -83,7 +93,12 @@ psutil文档(5.9.8)原文: used: memory used, calculated differently depending o
 ```bash
 /sys/class/hwmon/hwmon0/temp1_input
 ```
-
+#### RDK X5
+在X5上有三个温度传感器，用于显示DDR/BPU/CPU的温度 在/sys/class/hwmon/下有hwmon0目录下包含温度传感器的相关参数 temp1_input是DDR的温度，temp2_input是BPU的温度，temp3_input是CPU的温度 温度的精度为0.001摄氏度  
+此处选择的是CPU的温度
+```bash
+/sys/class/hwmon/hwmon0/temp3_input
+```
 #### RDK Ultra
 
 RDK Ultra有多个温度点,此处选择的是cpu-thermal.
@@ -103,8 +118,8 @@ cat /sys/devices/virtual/thermal/thermal_zone*/temp
 ```
 
 ### 3.4 频率数据
-#### RDK X3, RDK X3 Module
-这两个设备的CPU是统一调度,所以读取一个文件即可
+#### RDK X3, RDK X3 Module, RDK X5
+这三个设备的CPU是统一调度,所以读取一个文件即可
 ```bash
 /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_cur_freq
 ```
@@ -143,7 +158,15 @@ Perfoemace Node的主要实现方式为利用`os.system()`函数向命令行发�
 ```bash
 sudo bash -c "echo performance > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor"
 ```
-
+#### RDK X5
+```bash
+# CPU: 1.8Ghz
+sudo bash -c "echo 1 > /sys/devices/system/cpu/cpufreq/boost"  
+# Performance Mode
+sudo bash -c "echo performance > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor" 
+# BPU: 1.2GHz
+echo 1200000000 > /sys/kernel/debug/clk/bpu_mclk_2x_clk/clk_rate 
+```
 #### RDK Ultra
 ```bash
 sudo bash -c "echo performance > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor" && \
