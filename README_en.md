@@ -40,15 +40,20 @@ The Performance Node application is a web-based tool accessible via any computer
 
    - **BPU Data**: BPU utilization data comes from files specific to the devices:
      - For RDK X3, RDK X3 Module, and RDK Ultra: `/sys/devices/system/bpu/bpu0/ratio` and `/sys/devices/system/bpu/bpu1/ratio`.
-
+   - **GPU Data**：GPU utilization data comes from files specific to the devices:
+      - For RDK X5: `/sys/kernel/debug/gc/load`
    - **Memory Data**: Memory usage stats are gathered through `psutil.virtual_memory()`, returning a named tuple with details such as `available` memory, which is the amount immediately allocatable to processes without swapping, and `used` memory, which is calculated differently across platforms and intended for informational purposes.
 
    - **Temperature Data**: Temperature readings come from different paths for each device:
      - RDK X3, RDK X3 Module: `/sys/class/hwmon/hwmon0/temp1_input`
+     - RDK X5 :   
+     &nbsp;&nbsp;&nbsp;&nbsp;DDR:`/sys/class/hwmon/hwmon0/temp1_input`  
+     &nbsp;&nbsp;&nbsp;&nbsp;BPU:`/sys/class/hwmon/hwmon0/temp2_input`  
+     &nbsp;&nbsp;&nbsp;&nbsp;CPU:`/sys/class/hwmon/hwmon0/temp3_input`
      - RDK Ultra: `/sys/devices/virtual/thermal/thermal_zone8/temp` (among others)
 
    - **Frequency Data**:
-     - RDK X3, RDK X3 Module read frequency data from one file: `/sys/devices/system/cpu/cpufreq/policy0/cpuinfo_cur_freq`.
+     - RDK X3, RDK X3 Module, RDK X5read frequency data from one file: `/sys/devices/system/cpu/cpufreq/policy0/cpuinfo_cur_freq`.
      - RDK Ultra doesn't collect this data due to its impact on system load.
 
    - **Disk Usage Data**: Disk usage statistics are retrieved with `psutil.disk_usage()`, providing information about total capacity, used space, free space, and usage percentage for a specified directory. The `used` field indicates total used space while `free` represents available space for regular users.
@@ -56,6 +61,7 @@ The Performance Node application is a web-based tool accessible via any computer
 6. **Performance Mode Settings**
    Performance modes can be changed by sending commands to the command line via `os.system()`:
    - For RDK X3 and RDK X3 Module, setting the CPU governor to 'performance' mode involves echoing the word 'performance' to a specific file.
+   - For RDK X5, setting the CPU governor to 'performance' mode involves echoing the word 'performance' to a specific file.
    - For RDK Ultra, similar commands are run for all eight CPU policies.
 
 The application includes various power/performance modes such as 'performance' (highest frequency), 'powersave' (lowest frequency), and 'schedutil' (Linux 4.7+ strategy adjusting frequency based on scheduler-provided CPU utilization info).
