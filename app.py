@@ -17,6 +17,8 @@ from psutil import cpu_percent, virtual_memory, disk_usage
 from os import system
 import argparse
 
+from time import time
+
 DEVICE_NAME = "rdkx3"
 DEVICE_NUM = 0 # 0:rdkx3, 1:rdkultra 2:rdkx5
 mode_list = ["performance", "schedutil", "powersave"]
@@ -53,6 +55,19 @@ def getState_rdks100():
     stateString += "%s,"%cpu_temp.read()[0:5]
     bpu0.close()
     cpu_temp.close()
+    
+    ## ION
+    ion_cma = open('/sys/kernel/debug/ion/heaps/ion_cma', 'r', encoding='utf-8').read().split('\n')
+    ion_cma_used = int(ion_cma[-3].split(' ')[-1])
+    ion_cma_total = int(ion_cma[4].split(' ')[-1])
+    cma_reserved = open('/sys/kernel/debug/ion/heaps/cma_reserved', 'r', encoding='utf-8').read().split('\n')
+    cma_reserved_used = int(cma_reserved[-3].split(' ')[-1])
+    cma_reserved_total = int(cma_reserved[4].split(' ')[-1])
+    carveout = open('/sys/kernel/debug/ion/heaps/carveout', 'r', encoding='utf-8').read().split('\n')
+    carveout_used = int(carveout[-3].split(' ')[-1])
+    carveout_total = int(carveout[4].split(' ')[-1])
+
+    stateString += "%012d,%012d,%012d,%012d,%012d,%012d,"%(ion_cma_used, cma_reserved_used, carveout_used, ion_cma_total, cma_reserved_total, carveout_total)
 
     return stateString
 

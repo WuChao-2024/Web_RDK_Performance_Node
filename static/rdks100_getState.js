@@ -31,7 +31,7 @@ var cpu_option = {
         itemWidth: 20, // 图例项宽度，根据实际情况调整以适应4个图例项一行
         itemGap: 2, // 图例项之间的间距，根据实际需要调整
         data: ['CPU_0', 'CPU_1', 'CPU_2', 'CPU_3', 'CPU_4', 'CPU_5'],
-        color:chart_colors
+        color: chart_colors
     },
     toolbox: {
         feature: {
@@ -252,7 +252,13 @@ var mem_option = {
         }
     },
     legend: {
-        data: ['Used', 'Free']
+        x: 'center', // 水平居中
+        y: 'top', // 图例位于顶部
+        padding: [0, 120], // 可选，设置内边距
+        itemWidth: 20, // 图例项宽度，根据实际情况调整以适应4个图例项一行
+        itemGap: 2, // 图例项之间的间距，根据实际需要调整
+        data: ['ion_cma_Used', 'cma_reserved_Used', 'carveout_Used', 'cpu_Used', 'ion_cma_Free', 'cma_reserved_Free', 'carveout_Free', 'cpu_Free'],
+        // color: chart_colors
     },
     toolbox: {
         feature: {
@@ -294,7 +300,7 @@ var mem_option = {
     series: [
         {
             symbol: "none",
-            name: 'Used',
+            name: 'ion_cma_Used',
             type: 'line',
             stack: 'Total',
             areaStyle: {},
@@ -305,7 +311,73 @@ var mem_option = {
         },
         {
             symbol: "none",
-            name: 'Free',
+            name: 'cma_reserved_Used',
+            type: 'line',
+            stack: 'Total',
+            areaStyle: {},
+            emphasis: {
+                focus: 'series'
+            },
+            data: []
+        },
+        {
+            symbol: "none",
+            name: 'carveout_Used',
+            type: 'line',
+            stack: 'Total',
+            areaStyle: {},
+            emphasis: {
+                focus: 'series'
+            },
+            data: []
+        },
+        {
+            symbol: "none",
+            name: 'cpu_Used',
+            type: 'line',
+            stack: 'Total',
+            areaStyle: {},
+            emphasis: {
+                focus: 'series'
+            },
+            data: []
+        },
+        {
+            symbol: "none",
+            name: 'ion_cma_Free',
+            type: 'line',
+            stack: 'Total',
+            areaStyle: {},
+            emphasis: {
+                focus: 'series'
+            },
+            data: []
+        },
+        {
+            symbol: "none",
+            name: 'cma_reserved_Free',
+            type: 'line',
+            stack: 'Total',
+            areaStyle: {},
+            emphasis: {
+                focus: 'series'
+            },
+            data: []
+        },
+        {
+            symbol: "none",
+            name: 'carveout_Free',
+            type: 'line',
+            stack: 'Total',
+            areaStyle: {},
+            emphasis: {
+                focus: 'series'
+            },
+            data: []
+        },
+        {
+            symbol: "none",
+            name: 'cpu_Free',
             type: 'line',
             stack: 'Total',
             areaStyle: {},
@@ -389,7 +461,7 @@ var data_array_len = 120;
 var sh_control;           // CPU, BPU, MEM状态更新的POST函数间隔任务的控制句柄
 // 从stateString解析数据
 var cpu_total, cpu_0, cpu_1, cpu_2, cpu_3, cpu_4, cpu_5, cpu_6, cpu_7;
-var mem_rate, mem_free, mem_used;
+var mem_rate, mem_free, mem_used, ion_cma_used, cma_reserved_used, carveout_used, ion_cma_free, cma_reserved_free, carveout_free;
 var bpu_total, bpu_0, bpu1;
 var temp;
 // 从diskInfo解析数据
@@ -407,9 +479,15 @@ let cpu_5_data = new Array(data_array_len).fill(0.0);
 let bpu_0_data = new Array(data_array_len).fill(0.0);
 
 /// MEM
+let ion_cma_used_data = new Array(data_array_len).fill(0.0);
+let cma_reserved_used_data = new Array(data_array_len).fill(0.0);
+let carveout_used_data = new Array(data_array_len).fill(0.0);
 let mem_used_data = new Array(data_array_len).fill(0.0);
-let mem_free_data = new Array(data_array_len).fill(0.0);
 
+let ion_cma_free_data = new Array(data_array_len).fill(0.0);
+let cma_reserved_free_data = new Array(data_array_len).fill(0.0);
+let carveout_free_data = new Array(data_array_len).fill(0.0);
+let mem_free_data = new Array(data_array_len).fill(0.0);
 
 // 初始化函数
 function boot_all_interval() {
@@ -427,8 +505,14 @@ function boot_all_interval() {
     bpu_option.series[0].data = bpu_0_data;
     bpu_chart.setOption(bpu_option);
     // mem 数据初始化
-    mem_option.series[0].data = mem_used_data;
-    mem_option.series[1].data = mem_free_data;
+    mem_option.series[0].data = ion_cma_used_data;
+    mem_option.series[1].data = cma_reserved_used_data;
+    mem_option.series[2].data = carveout_used_data;
+    mem_option.series[3].data = mem_used_data;
+    mem_option.series[4].data = ion_cma_free_data;
+    mem_option.series[5].data = cma_reserved_free_data;
+    mem_option.series[6].data = carveout_free_data;
+    mem_option.series[7].data = mem_free_data;
     mem_chart.setOption(mem_option);
     // 开始定时任务
     sh_control = setInterval(POST_state, time_interval);
@@ -516,26 +600,54 @@ function POST_state() {
             cpu_option.series[1].data = cpu_1_data;
             cpu_option.series[2].data = cpu_2_data;
             cpu_option.series[3].data = cpu_3_data;
-            cpu_option.series[4].data = cpu_3_data;
-            cpu_option.series[5].data = cpu_3_data;
+            cpu_option.series[4].data = cpu_4_data;
+            cpu_option.series[5].data = cpu_5_data;
             cpu_chart.setOption(cpu_option);
             /// MEM 部分
             //// 得到数据
+            ion_cma_used = parseFloat(stateString_split[10]) / 1024 / 1024;
+            cma_reserved_used = parseFloat(stateString_split[11]) / 1024 / 1024;
+            carveout_used = parseFloat(stateString_split[12]) / 1024 / 1024;
+            ion_cma_free = parseFloat(stateString_split[13]) / 1024 / 1024 - ion_cma_used;
+            cma_reserved_free = parseFloat(stateString_split[14]) / 1024 / 1024 - cma_reserved_used;
+            carveout_free = parseFloat(stateString_split[15]) / 1024 / 1024 - carveout_used;
             mem_used = parseFloat(stateString_split[6]) / 1024 / 1024;
             mem_free = parseFloat(stateString_split[7]) / 1024 / 1024;
             //// 更新MEM看板数据
-            mem_rate = (100 * mem_used / (mem_used + mem_free)).toFixed(1);
+            mem_rate = (100 * (ion_cma_used + cma_reserved_used + carveout_used + mem_used) / (ion_cma_used + cma_reserved_used + carveout_used + mem_used + ion_cma_free + cma_reserved_free + carveout_free + mem_free)).toFixed(1);
             document.getElementById("Mem").innerHTML = mem_rate;
             //// 更新MEM图表数据
+            ion_cma_used_data = ion_cma_used_data.slice(1);
+            ion_cma_used_data.push(ion_cma_used.toFixed(1));
+            cma_reserved_used_data = cma_reserved_used_data.slice(1);
+            cma_reserved_used_data.push(cma_reserved_used.toFixed(1));
+            carveout_used_data = carveout_used_data.slice(1);
+            carveout_used_data.push(carveout_used.toFixed(1));
             mem_used_data = mem_used_data.slice(1);
             mem_used_data.push(mem_used.toFixed(1));
+
+            ion_cma_free_data = ion_cma_free_data.slice(1);
+            ion_cma_free_data.push(ion_cma_free.toFixed(1));
+            cma_reserved_free_data = cma_reserved_free_data.slice(1);
+            cma_reserved_free_data.push(cma_reserved_free.toFixed(1));
+            carveout_free_data = carveout_free_data.slice(1);
+            carveout_free_data.push(carveout_free.toFixed(1));
             mem_free_data = mem_free_data.slice(1);
             mem_free_data.push(mem_free.toFixed(1));
+
             //// 将MEM图表的数据设置使能图表
             mem_option.title.text = 'Memory\n' + mem_rate + ' % (MiB)';
-            mem_option.series[0].data = mem_used_data;
-            mem_option.series[1].data = mem_free_data;
+            mem_option.series[0].data = ion_cma_used_data;
+            mem_option.series[1].data = cma_reserved_used_data;
+            mem_option.series[2].data = carveout_used_data;
+            mem_option.series[3].data = mem_used_data;
+            mem_option.series[4].data = ion_cma_free_data;
+            mem_option.series[5].data = cma_reserved_free_data;
+            mem_option.series[6].data = carveout_free_data;
+            mem_option.series[7].data = mem_free_data;
             mem_chart.setOption(mem_option);
+
+        
             // BPU 部分
             //// 得到BPU数据
             bpu_0 = parseFloat(stateString_split[8]);
