@@ -32,6 +32,30 @@ def index_wide():
     return render_template(DEVICE_NAME + "_wide.html")
 
 # 请求CPU, BPU, Memory, Tempture 信息（快速）
+
+@app.route("/getState_rdks100")
+def getState_rdks100():
+    stateString = ""
+    ## CPU
+    # cpu0, cpu1, cpu2, cpu3, cpu4, cpu5
+    cpus = cpu_percent(percpu=True)
+    stateString += "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,"%((cpus[0],cpus[1],cpus[2],cpus[3],cpus[4],cpus[5]))
+    
+    ## Memory
+    # memory_free, memoryrate, (MiB)
+    memorys = virtual_memory()
+    stateString += "%012d,%012d,"%(memorys[3], memorys[1])
+    
+    ## BPU  ## Temp   ## CPU freq
+    bpu0 = open('/sys/devices/system/bpu/bpu0/ratio', 'r', encoding='utf-8')
+    cpu_temp = open('/sys/devices/virtual/thermal/thermal_zone0/temp', 'r',  encoding='utf-8')
+    stateString += "%03d,"%(int(bpu0.read()))
+    stateString += "%s,"%cpu_temp.read()[0:5]
+    bpu0.close()
+    cpu_temp.close()
+
+    return stateString
+
 @app.route("/getState_rdkultra")
 def getState_rdkultra():
     stateString = ""
@@ -125,7 +149,15 @@ def getState_rdkx3():
     return stateString
 
 # 请求磁盘占用信息（慢速）
-@app.route("/getDisk_rdkultra")
+@app.route("/getDisk_rdks100")
+def getDisk_rdks100():
+    ## 磁盘信息
+    ## total, free
+    disk_info = disk_usage("/")
+    disk_info_string = "%014d,%014d"%(disk_info[1],disk_info[2])
+    return disk_info_string
+
+@app.route("/getDisk_rdkx5")
 def getDisk_rdkx5():
     ## 磁盘信息
     ## total, free
@@ -133,8 +165,7 @@ def getDisk_rdkx5():
     disk_info_string = "%014d,%014d"%(disk_info[1],disk_info[2])
     return disk_info_string
 
-# 请求磁盘占用信息（慢速）
-@app.route("/getDisk_rdkx5")
+@app.route("/getDisk_rdkultra")
 def getDisk_rdkultra():
     ## 磁盘信息
     ## total, free
@@ -206,6 +237,10 @@ if __name__ == "__main__":
             DEVICE_NAME = "rdkx5"
             DEVICE_NUM = 2
             print("\033[31m"+"Auto Select Device: RDK X5"+"\033[0m")
+        elif "S100" in tree:
+            DEVICE_NAME = "rdks100"
+            DEVICE_NUM = 3
+            print("\033[31m"+"Auto Select Device: RDK S100"+"\033[0m")
         else:
             print("\033[31m"+"Your device didn't support."+"\033[0m")
             exit()
