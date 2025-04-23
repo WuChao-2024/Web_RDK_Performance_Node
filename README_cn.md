@@ -31,9 +31,9 @@ python3 app.py
 $ python3 app.py --help
 usage: app.py [-h] [--device DEVICE] [--port PORT] [--debug DEBUG] [--log LOG]
 
-optional arguments:
+options:
   -h, --help       show this help message and exit
-  --device DEVICE  0: RDK X3 (Module), 1: RDK Ultra, 2: RDK X5
+  --device DEVICE  0: RDK X3 (Module), 1: RDK Ultra, 2: RDK X5, 3: RDK S100
   --port PORT      enter the port you like.
   --debug DEBUG    Flask Debug Mode, 0:false, 1:true.
   --log LOG        Flask log, 0:false, 1:true.
@@ -69,6 +69,12 @@ BPU占用率数据来自于以下文件
 ```bash
 /sys/devices/system/bpu/bpu0/ratio
 ```
+
+#### RDK S100
+```bash
+/sys/devices/system/bpu/bpu0/ratio
+```
+
 ### 3.3 GPU占用数据
 #### RDK X5
 ```bash
@@ -76,7 +82,7 @@ BPU占用率数据来自于以下文件
 ```
 
 ### 3.4 内存占用数据
-#### RDK X3, RDK X3 Module, RDK Ultra
+#### RDK X3, RDK X3 Module, RDK Ultra, RDK S100
 通过`psutil.virtual_memory()`函数获取内存信息,该函数返回一个命名元组,包含多种关于系统虚拟内存的信息.
 
 `available`字段: 可用内存, 指无需系统进入交换状态即可立即分配给进程的内存总量. 这个值是通过对不同平台下不同内存指标进行求和计算得出的, 旨在提供一种跨平台监控实际内存使用情况的方法.
@@ -86,6 +92,13 @@ psutil文档(5.9.8)原文: available: the memory that can be given instantly to 
 `used`字段: 已使用内存, 已使用的内存大小会根据不同平台有所差异,并且主要用于信息展示目的.需要注意的是, "total - free" (总内存减去空闲内存) 并不一定与“used”（已使用内存）相匹配.
 
 psutil文档(5.9.8)原文: used: memory used, calculated differently depending on the platform and designed for informational purposes only. total - free does not necessarily match used.
+
+#### RDK S100 ION Memory
+```bash
+/sys/kernel/debug/ion/heaps/ion_cma
+/sys/kernel/debug/ion/heaps/cma_reserved
+/sys/kernel/debug/ion/heaps/carveout
+```
 
 ### 3.4 温度数据
 温度数据来自于以下文件
@@ -104,6 +117,12 @@ psutil文档(5.9.8)原文: used: memory used, calculated differently depending o
 RDK Ultra有多个温度点,此处选择的是cpu-thermal.
 ```bash
 /sys/devices/virtual/thermal/thermal_zone8/temp
+```
+
+#### RDK S100
+RDK S100有多个温度点,此处选择的是thermal_zone0.
+```bash
+/sys/devices/virtual/thermal/thermal_zone0/temp
 ```
 
 
@@ -126,8 +145,9 @@ cat /sys/devices/virtual/thermal/thermal_zone*/temp
 #### RDK Ultra
 在RDK Ultra上,需要读取8个文件,对系统负载影响较大,故不采集这个数据.
 
+
 ### 3.5 硬盘数据
-#### RDK X3, RDK X3 Module, RDK Ultra
+#### RDK X3, RDK X3 Module, RDK Ultra, RDK S100
 通过`psutil.disk_usage()`函数获取内存信息, 我们可以获取指定路径所在磁盘分区的使用情况统计数据.此函数返回一个命名元组,包含了以字节为单位表示的总容量、已用空间和剩余可用空间,以及磁盘使用率百分比.
 
 Performance Node使用了以下两个字段, 与Unix/Linux系统中的`df`命令行工具输出的数据是匹配的.
