@@ -27,19 +27,25 @@ The Performance Node application is a web-based tool accessible via any computer
 
 4. **Command Line Arguments**
    Users can manually specify parameters when running the application:
-   ```bash
-   python3 app.py --device 1 --port 6666 --debug 1 --log 1
-   ```
-   - `--device`: Choose the device type between RDK X3 (Module), RDK Ultra, or RDK X5; defaults to `-1` for automatic detection based on the device tree.
-   - `--port`: Specify the desired port number; defaults to `7999`.
-   - `--debug`: Enable Flask debug mode (`1` for true, `0` for false); default is disabled (`0`).
-   - `--log`: Turn on Flask HTTP request/response logging (`1` for true, `0` for false); default is disabled (`0`).
+```bash
+python3 app.py --device 1 --port 6666 --debug 1 --log 1
+
+options:
+  -h, --help       show this help message and exit
+  --device DEVICE  0: RDK X3 (Module), 1: RDK Ultra, 2: RDK X5, 3: RDK S100
+  --port PORT      enter the port you like.
+  --debug DEBUG    Flask Debug Mode, 0:false, 1:true.
+  --log LOG        Flask log, 0:false, 1:true.
+```
+
 
 5. **Data Collection**
    - **CPU Data**: The CPU usage percentages for each logical processor are obtained using `psutil.cpu_percent(percpu=True)`. A list of float values is returned, with each entry corresponding to the utilization of a specific CPU core, maintaining the same order across calls even when invoked from different threads.
 
    - **BPU Data**: BPU utilization data comes from files specific to the devices:
      - For RDK X3, RDK X3 Module, and RDK Ultra: `/sys/devices/system/bpu/bpu0/ratio` and `/sys/devices/system/bpu/bpu1/ratio`.
+     - For RDK S100: `/sys/devices/system/bpu/bpu0/ratio`.
+     
    - **GPU Data**：GPU utilization data comes from files specific to the devices:
       - For RDK X5: `/sys/kernel/debug/gc/load`
    - **Memory Data**: Memory usage stats are gathered through `psutil.virtual_memory()`, returning a named tuple with details such as `available` memory, which is the amount immediately allocatable to processes without swapping, and `used` memory, which is calculated differently across platforms and intended for informational purposes.
