@@ -231,7 +231,7 @@ def mode_rdkx3():
 if __name__ == "__main__":
     # 用户输入
     parser = argparse.ArgumentParser()
-    parser.add_argument('--device', type=int, default='-1', help='0: RDK X3 (Module), 1: RDK Ultra, 2: RDK X5\n')
+    parser.add_argument('--device', type=int, default='-1', help='0: RDK X3 (Module), 1: RDK Ultra, 2: RDK X5, 3: RDK S100\n')
     parser.add_argument('--port', type=int, default='7999', help='enter the port you like.')
     parser.add_argument('--debug', type=int, default='0', help='Flask Debug Mode, 0:false, 1:true.')
     parser.add_argument('--log', type=int, default='0', help='Flask log, 0:false, 1:true.')
@@ -271,6 +271,10 @@ if __name__ == "__main__":
         DEVICE_NAME = "rdkx5"
         DEVICE_NUM = 2
         print("\033[31m"+"User Select Device: RDK X5"+"\033[0m")
+    elif opt.device == 3:
+        DEVICE_NAME = "rdks100"
+        DEVICE_NUM = 3
+        print("\033[31m"+"User Select Device: RDK S100"+"\033[0m")
     else:
         print("\033[31m"+"Wrong Device Number."+"\033[0m")
         exit()

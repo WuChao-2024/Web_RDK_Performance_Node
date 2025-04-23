@@ -1,6 +1,7 @@
 // 颜色
 var chart_colors = ['#FF64DA','#FFD700', '#E1FF25', '#1E90FF', '#5470c6', '#042AFF']
 var bpu_colors  = ['#FF5125','#3ba272', '#fc8452', '#9a60b4', '#5470c6', '#FF5125']
+var mem_colors  = ['#8080ff','#3333ff', '#0000e6', '#000099', '#8cd98c', '#79d279', '#66cc66', '#40bf40']
 //Echarts图表
 // CPU
 var cpu_chart = echarts.init(
@@ -74,7 +75,7 @@ var cpu_option = {
     series: [
         {
             symbol: "none",
-            color:chart_colors[0],
+            color: chart_colors[0],
             name: 'CPU_0',
             type: 'line',
             stack: 'Total',
@@ -86,7 +87,7 @@ var cpu_option = {
         },
         {
             symbol: "none",
-            color:chart_colors[1],
+            color: chart_colors[1],
             name: 'CPU_1',
             type: 'line',
             stack: 'Total',
@@ -98,7 +99,7 @@ var cpu_option = {
         },
         {
             symbol: "none",
-            color:chart_colors[2],
+            color: chart_colors[2],
             name: 'CPU_2',
             type: 'line',
             stack: 'Total',
@@ -110,7 +111,7 @@ var cpu_option = {
         },
         {
             symbol: "none",
-            color:chart_colors[3],
+            color: chart_colors[3],
             name: 'CPU_3',
             type: 'line',
             stack: 'Total',
@@ -122,7 +123,7 @@ var cpu_option = {
         },
         {
             symbol: "none",
-            color:chart_colors[4],
+            color: chart_colors[4],
             name: 'CPU_4',
             type: 'line',
             stack: 'Total',
@@ -134,7 +135,7 @@ var cpu_option = {
         },
         {
             symbol: "none",
-            color:chart_colors[5],
+            color: chart_colors[5],
             name: 'CPU_5',
             type: 'line',
             stack: 'Total',
@@ -258,7 +259,7 @@ var mem_option = {
         itemWidth: 20, // 图例项宽度，根据实际情况调整以适应4个图例项一行
         itemGap: 2, // 图例项之间的间距，根据实际需要调整
         data: ['ion_cma_Used', 'cma_reserved_Used', 'carveout_Used', 'cpu_Used', 'ion_cma_Free', 'cma_reserved_Free', 'carveout_Free', 'cpu_Free'],
-        // color: chart_colors
+        color: mem_colors
     },
     toolbox: {
         feature: {
@@ -300,6 +301,7 @@ var mem_option = {
     series: [
         {
             symbol: "none",
+            color: mem_colors[0],
             name: 'ion_cma_Used',
             type: 'line',
             stack: 'Total',
@@ -311,6 +313,7 @@ var mem_option = {
         },
         {
             symbol: "none",
+            color: mem_colors[1],
             name: 'cma_reserved_Used',
             type: 'line',
             stack: 'Total',
@@ -322,6 +325,7 @@ var mem_option = {
         },
         {
             symbol: "none",
+            color: mem_colors[2],
             name: 'carveout_Used',
             type: 'line',
             stack: 'Total',
@@ -333,6 +337,7 @@ var mem_option = {
         },
         {
             symbol: "none",
+            color: mem_colors[3],
             name: 'cpu_Used',
             type: 'line',
             stack: 'Total',
@@ -344,6 +349,7 @@ var mem_option = {
         },
         {
             symbol: "none",
+            color: mem_colors[4],
             name: 'ion_cma_Free',
             type: 'line',
             stack: 'Total',
@@ -355,6 +361,7 @@ var mem_option = {
         },
         {
             symbol: "none",
+            color: mem_colors[5],
             name: 'cma_reserved_Free',
             type: 'line',
             stack: 'Total',
@@ -366,6 +373,7 @@ var mem_option = {
         },
         {
             symbol: "none",
+            color: mem_colors[6],
             name: 'carveout_Free',
             type: 'line',
             stack: 'Total',
@@ -377,6 +385,7 @@ var mem_option = {
         },
         {
             symbol: "none",
+            color: mem_colors[7],
             name: 'cpu_Free',
             type: 'line',
             stack: 'Total',
